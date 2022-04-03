@@ -50,7 +50,7 @@ from wbb.utils.inlinefuncs import keywords_list
 async def clean_db(_, message):
     served_chats = [int(i["chat_id"]) for i in (await get_served_chats())]
     m = await message.reply(
-        f"__**Cleaning database, Might take around {len(served_chats) * 2} seconds.**__",
+        f"__**Очистка базы данных, может занять около {len(served_chats) * 2} секунд.**__",
     )
     for served_chat in served_chats:
         try:
@@ -62,7 +62,7 @@ async def clean_db(_, message):
             await remove_served_chat(served_chat)
             served_chats.remove(served_chat)
             pass
-    await m.edit("**Database Cleaned.**")
+    await m.edit("**База данных очищена.**")
 
 
 @app.on_message(filters.command("gstats") & ~filters.edited & SUDOERS)
@@ -70,7 +70,7 @@ async def clean_db(_, message):
 async def global_stats(_, message):
     m = await app.send_message(
         message.chat.id,
-        text="__**Analysing Stats...**__",
+        text="__**Анализ статистики...**__",
         disable_web_page_preview=True,
     )
 
@@ -134,23 +134,23 @@ async def global_stats(_, message):
 
     msg = f"""
 **Global Stats of {BOT_NAME}**:
-    **{modules_count}** Modules Loaded.
-    **{len(keywords_list)}** Inline Modules Loaded.
-    **{rss_count}** Active RSS Feeds.
-    **{gbans}** Globally banned users.
-    **{filters_count}** Filters, Across **{filters_chats_count}** chats.
+    **{modules_count}** Модулей загружено.
+    **{len(keywords_list)}** Встроенных модулей загружено.
+    **{rss_count}** Активных RSS-каналов.
+    **{gbans}** Глобально забаненных пользователей.
+    **{filters_count}** Фильтров, Находятся в **{filters_chats_count}** чатах.
     **{blacklist_filters_count}** Blacklist Filters, Across **{blacklist_filters_chats_count}** chats.
-    **{notes_count}** Notes, Across **{notes_chats_count}** chats.
-    **{warns_count}** Warns, Across **{warns_chats_count}** chats.
-    **{karmas_count}** Karma, Across **{karmas_chats_count}** chats.
-    **{served_users}** Users, Across **{served_chats}** chats.
+    **{notes_count}** Заметок, Across **{notes_chats_count}** chats.
+    **{warns_count}** Варнов, Across **{warns_chats_count}** chats.
+    **{karmas_count}** Кармы, Across **{karmas_chats_count}** chats.
+    **{served_users}** Пользователей, Across **{served_chats}** chats.
     **{developers}** Developers And **{commits}** Commits On **[Github]({rurl})**.
 
 **Global Stats of {USERBOT_NAME}**:
-    **{total_ub} Dialogs.**
-    **{groups_ub} Groups Joined.**
-    **{channels_ub} Channels Joined.**
-    **{bots_ub} Bots.**
-    **{privates_ub} Users.**
+    **{total_ub} Диалогов.**
+    **{groups_ub} Присоединенных групп.**
+    **{channels_ub} Присоединенных каналов.**
+    **{bots_ub} Ботов.**
+    **{privates_ub} Пользователей.**
 """
     await m.edit(msg, disable_web_page_preview=True)

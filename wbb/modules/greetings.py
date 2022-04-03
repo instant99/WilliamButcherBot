@@ -61,19 +61,19 @@ from wbb.utils.dbfunctions import (
 from wbb.utils.filter_groups import welcome_captcha_group
 from wbb.utils.functions import extract_text_and_keyb, generate_captcha
 
-__MODULE__ = "Greetings"
+__MODULE__ = "Приветствие"
 __HELP__ = """
-/captcha [ENABLE|DISABLE] - Enable/Disable captcha.
+/captcha [ENABLE|DISABLE] - Включить/отключить капчу.
 
-/set_welcome - Reply this to a message containing correct
-format for a welcome message, check end of this message.
+/set_welcome - Ответьте на сообщение, содержащее правильный
+формат приветственного сообщения, проверьте конец этого сообщения.
 
-/del_welcome - Delete the welcome message.
-/get_welcome - Get the welcome message.
+/del_welcome - Удалить приветствие.
+/get_welcome - Получить текущее сообствение о приветствие.
 
 **SET_WELCOME ->**
 
-The format should be something like below.
+Формат должен быть примерно таким, как показано ниже.
 
 ```
 **Hi** {name} Welcome to {chat}
@@ -127,9 +127,9 @@ async def welcome(_, message: Message):
             if await is_gbanned_user(member.id):
                 await message.chat.ban_member(member.id)
                 await message.reply_text(
-                    f"{member.mention} was globally banned, and got removed,"
-                    + " if you think this is a false gban, you can appeal"
-                    + " for this ban in support chat."
+                    f"{member.mention} был забанен во глобально и удален,"
+                    + " если вы считаете, что это ложный гбан, вы можете подать апелляцию"
+                    + " за этот бан в чат поддержки."
                 )
                 continue
 
@@ -143,9 +143,9 @@ async def welcome(_, message: Message):
 
             await message.chat.restrict_member(member.id, ChatPermissions())
             text = (
-                f"{(member.mention())} Are you human?\n"
-                f"Solve this captcha in {WELCOME_DELAY_KICK_SEC} "
-                "seconds and 4 attempts or you'll be kicked."
+                f"{(member.mention())} Вы человек?\n"
+                f"Решите эту капчу за {WELCOME_DELAY_KICK_SEC} "
+                "секунд, на это у вас будет 4 попытки после чего вас кикнут."
             )
         except ChatAdminRequired:
             return
@@ -244,9 +244,9 @@ async def send_welcome_message(chat: Chat, user_id: int, delete: bool = False):
 
 @app.on_callback_query(filters.regex("pressed_button"))
 async def callback_query_welcome_button(_, callback_query):
-    """After the new member presses the correct button,
-    set his permissions to chat permissions,
-    delete button message and join message.
+    """После того, как новый участник нажмет правильную кнопку,
+    установятся его разрешения на разрешения для чата,
+    и удалится сообщение с кнопкой и присоединиться к сообщению.
     """
     global answers_dicc
     data = callback_query.data
@@ -269,14 +269,14 @@ async def callback_query_welcome_button(_, callback_query):
 
     if not (correct_answer and keyboard):
         return await callback_query.answer(
-            "Something went wrong, Rejoin the " "chat!"
+            "Что-то пошло не так, Перезайдите в " "чат!"
         )
 
     if pending_user_id != pressed_user_id:
-        return await callback_query.answer("This is not for you")
+        return await callback_query.answer("Это не для тебя")
 
     if answer != correct_answer:
-        await callback_query.answer("Yeah, It's Wrong.")
+        await callback_query.answer("Да, это неправильно.")
         for iii in answers_dicc:
             if (
                     iii["user_id"] == pending_user_id
@@ -305,7 +305,7 @@ async def callback_query_welcome_button(_, callback_query):
             reply_markup=keyboard,
         )
 
-    await callback_query.answer("Captcha passed successfully!")
+    await callback_query.answer("Капча успешно пройдена!")
     await button_message.chat.unban_member(pending_user_id)
     await button_message.delete()
 
@@ -330,8 +330,8 @@ async def callback_query_welcome_button(_, callback_query):
 async def kick_restricted_after_delay(
         delay, button_message: Message, user: User
 ):
-    """If the new member is still restricted after the delay, delete
-    button message and join message and then kick him
+    """Если новый участник все еще ограничен после задержки,
+    нажмите кнопку сообщения и присоединитесь к сообщению, а затем кикнете его
     """
     global answers_dicc
     await asyncio.sleep(delay)
@@ -363,7 +363,7 @@ async def _ban_restricted_user_until_date(
 @app.on_message(filters.command("captcha") & ~filters.private)
 @adminsOnly("can_restrict_members")
 async def captcha_state(_, message):
-    usage = "**Usage:**\n/captcha [ENABLE|DISABLE]"
+    usage = "**Применение:**\n/captcha [ENABLE|DISABLE]"
     if len(message.command) != 2:
         await message.reply_text(usage)
         return
@@ -372,10 +372,10 @@ async def captcha_state(_, message):
     state = state.lower()
     if state == "enable":
         await captcha_on(chat_id)
-        await message.reply_text("Enabled Captcha For New Users.")
+        await message.reply_text("Включена капча для новых пользователей.")
     elif state == "disable":
         await captcha_off(chat_id)
-        await message.reply_text("Disabled Captcha For New Users.")
+        await message.reply_text("Отключена капча для новых пользователей.")
     else:
         await message.reply_text(usage)
 
@@ -386,7 +386,7 @@ async def captcha_state(_, message):
 @app.on_message(filters.command("set_welcome") & ~filters.private)
 @adminsOnly("can_change_info")
 async def set_welcome_func(_, message):
-    usage = "You need to reply to a text, check the Greetings module in /help"
+    usage = "Вам нужно ответить на текст, проверьте модуль Приветствия в /help"
     if not message.reply_to_message:
         await message.reply_text(usage)
         return
@@ -396,9 +396,9 @@ async def set_welcome_func(_, message):
     chat_id = message.chat.id
     raw_text = message.reply_to_message.text.markdown
     if not (extract_text_and_keyb(ikb, raw_text)):
-        return await message.reply_text("Wrong formating, check help section.")
+        return await message.reply_text("Неверное форматирование, проверьте раздел справки.")
     await set_welcome(chat_id, raw_text)
-    await message.reply_text("Welcome message has been successfully set.")
+    await message.reply_text("Приветственное сообщение успешно установлено.")
 
 
 @app.on_message(filters.command("del_welcome") & ~filters.private)
@@ -406,7 +406,7 @@ async def set_welcome_func(_, message):
 async def del_welcome_func(_, message):
     chat_id = message.chat.id
     await del_welcome(chat_id)
-    await message.reply_text("Welcome message has been deleted.")
+    await message.reply_text("Приветственное сообщение было удалено.")
 
 
 @app.on_message(filters.command("get_welcome") & ~filters.private)
@@ -415,10 +415,10 @@ async def get_welcome_func(_, message):
     chat = message.chat
     welcome = await get_welcome(chat.id)
     if not welcome:
-        return await message.reply_text("No welcome message set.")
+        return await message.reply_text("Приветственное сообщение не установлено.")
     if not message.from_user:
         return await message.reply_text(
-            "You're anon, can't send welcome message."
+            "Вы анон, не можете отправить приветствие."
         )
 
     await send_welcome_message(chat, message.from_user.id)

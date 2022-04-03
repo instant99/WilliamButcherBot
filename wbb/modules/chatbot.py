@@ -40,12 +40,12 @@ from wbb import (
 from wbb.core.decorators.errors import capture_err
 from wbb.utils.filter_groups import chatbot_group
 
-__MODULE__ = "ChatBot"
+__MODULE__ = "Чат-бот"
 __HELP__ = """
-/chatbot [ENABLE|DISABLE] To Enable Or Disable ChatBot In Your Chat.
+/chatbot [ENABLE|DISABLE] Включение/отключение чат-бота в вашем чате.
 
-There's one module of this available for userbot also
-check userbot module help."""
+Один из модулей также доступен для пользовательского бота.
+проверьте справку по модулю бота."""
 
 active_chats_bot = []
 active_chats_ubot = []
@@ -57,16 +57,16 @@ async def chat_bot_toggle(db, message: Message):
     if status == "enable":
         if chat_id not in db:
             db.append(chat_id)
-            text = "Chatbot Enabled!"
+            text = "Чат-бот включен!"
             return await eor(message, text=text)
-        await eor(message, text="ChatBot Is Already Enabled.")
+        await eor(message, text="Чат-бот включен.")
     elif status == "disable":
         if chat_id in db:
             db.remove(chat_id)
-            return await eor(message, text="Chatbot Disabled!")
-        await eor(message, text="ChatBot Is Already Disabled.")
+            return await eor(message, text="Чат-бот отключен!")
+        await eor(message, text="Чат-бот уже отключен.")
     else:
-        await eor(message, text="**Usage:**\n/chatbot [ENABLE|DISABLE]")
+        await eor(message, text="**Применение:**\n/chatbot [ENABLE|DISABLE]")
 
 
 # Enabled | Disable Chatbot
@@ -127,7 +127,7 @@ async def chatbot_talk(_, message: Message):
 @capture_err
 async def chatbot_status_ubot(_, message: Message):
     if len(message.text.split()) != 2:
-        return await eor(message, text="**Usage:**\n.chatbot [ENABLE|DISABLE]")
+        return await eor(message, text="**Применение:**\n.chatbot [ENABLE|DISABLE]")
     await chat_bot_toggle(active_chats_ubot, message)
 
 

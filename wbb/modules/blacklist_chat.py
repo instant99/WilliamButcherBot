@@ -9,16 +9,16 @@ from wbb.utils.dbfunctions import (
     whitelist_chat,
 )
 
-__MODULE__ = "Blacklist Chat"
+__MODULE__ = "ЧС Чатов"
 __HELP__ = """
-**THIS MODULE IS ONLY FOR DEVS**
+**ТОЛЬКО ДЛЯ РАЗРАБОТЧИКА БОТА**
 
-Use this module to make the bot leave some chats
-in which you don't want it to be in.
+Используйте этот модуль, чтобы заставить бота покинуть некоторые чаты
+в котором вы не хотите, чтобы он был внутри.
 
-/blacklist_chat [CHAT_ID] - Blacklist a chat.
-/whitelist_chat [CHAT_ID] - Whitelist a chat.
-/blacklisted - Show blacklisted chats.
+/blacklist_chat [CHAT_ID] - Добавить чат в черный список.
+/whitelist_chat [CHAT_ID] - Убрать слово с черного списка.
+/blacklisted - Показать список слов в черном списке.
 """
 
 
@@ -27,17 +27,17 @@ in which you don't want it to be in.
 async def blacklist_chat_func(_, message: Message):
     if len(message.command) != 2:
         return await message.reply_text(
-            "**Usage:**\n/blacklist_chat [CHAT_ID]"
+            "**Применение:**\n/blacklist_chat [CHAT_ID]"
         )
     chat_id = int(message.text.strip().split()[1])
     if chat_id in await blacklisted_chats():
-        return await message.reply_text("Chat is already blacklisted.")
+        return await message.reply_text("Чат уже занесен в черный список.")
     blacklisted = await blacklist_chat(chat_id)
     if blacklisted:
         return await message.reply_text(
-            "Chat has been successfully blacklisted"
+            "Чат был успешно занесен в черный список"
         )
-    await message.reply_text("Something wrong happened, check logs.")
+    await message.reply_text("Произошла ошибка, проверьте лог.")
 
 
 @app.on_message(filters.command("whitelist_chat") & SUDOERS)
@@ -45,17 +45,17 @@ async def blacklist_chat_func(_, message: Message):
 async def whitelist_chat_func(_, message: Message):
     if len(message.command) != 2:
         return await message.reply_text(
-            "**Usage:**\n/whitelist_chat [CHAT_ID]"
+            "**Применение:**\n/whitelist_chat [CHAT_ID]"
         )
     chat_id = int(message.text.strip().split()[1])
     if chat_id not in await blacklisted_chats():
-        return await message.reply_text("Chat is already whitelisted.")
+        return await message.reply_text("Чат уже внесен в белый список.")
     whitelisted = await whitelist_chat(chat_id)
     if whitelisted:
         return await message.reply_text(
-            "Chat has been successfully whitelisted"
+            "Чат был успешно занесен в белый список"
         )
-    await message.reply_text("Something wrong happened, check logs.")
+    await message.reply_text("Произошла ошибка, проверьте лог.")
 
 
 @app.on_message(filters.command("blacklisted_chats") & SUDOERS)
@@ -69,5 +69,5 @@ async def blacklisted_chats_func(_, message: Message):
             title = "Private"
         text += f"**{count}. {title}** [`{chat_id}`]\n"
     if text == "":
-        return await message.reply_text("No blacklisted chats found.")
+        return await message.reply_text("Чаты из черного списка не найдены.")
     await message.reply_text(text)

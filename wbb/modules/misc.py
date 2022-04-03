@@ -37,110 +37,64 @@ from wbb.utils.http import get
 from wbb.utils.json_prettify import json_prettify
 from wbb.utils.pastebin import paste
 
-__MODULE__ = "Misc"
+__MODULE__ = "Прочее"
 __HELP__ = """
 /asq
-    Ask a question
+    Задайте вопрос
 
 /commit
-    Generate Funny Commit Messages
+    Создавайте забавные сообщения о коммитах
 
 /runs
-    Idk Test Yourself
+    Не знаю, проверьте себя
 
 /id
-    Get Chat_ID or User_ID
+    Получить Chat_ID или User_ID
 
 /random [Length]
-    Generate Random Complex Passwords
+    Генерация случайных сложных паролей
 
 /cheat [Language] [Query]
-    Get Programming Related Help
+    Получить справку по программированию
 
 /tr [LANGUAGE_CODE]
-    Translate A Message
-    Ex: /tr en
+    Перевести сообщение (Нужно ответить на него)
+    Пример: /tr en
 
 /json [URL]
-    Get parsed JSON response from a rest API.
+    Получить проанализированный ответ JSON от API отдыха.
 
 /arq
-    Statistics Of ARQ API.
+    Статистика ARQ API.
 
-/webss | .webss [URL] [FULL_SIZE?, use (y|yes|true) to get full size image. (optional)]
-    Take A Screenshot Of A Webpage
+/webss | .webss [URL] [FULL_SIZE?, используйте (y|yes|true) чтобы получить полноразмерное изображение. (optional)]
+    Сделайте скриншот веб-страницы
 
 /reverse
-    Reverse search an image.
+    Обратный поиск изображения.
 
 /carbon
-    Make Carbon from code.
+    Сделать карбоновый код (Рамка с сообщение)
 
 /tts
-    Convert Text To Speech.
-
-/autocorrect [Reply to a message]
-    Autocorrects the text in replied message.
-
-/pdf [Reply to an image (as document) or a group of images.]
-    Convert images to PDF, helpful for online classes.
+    Преобразование текста в речь.
 
 /markdownhelp
-    Sends mark down and formatting help.
+    Отправляет помощь по форматированию текста.
 
 /backup
-    Backup database
-
-/ping
-    Check ping of all 5 DCs.
+    Забекапить БД
     
-#RTFM - Tell noobs to read the manual
+#RTFM - Скажи нубам, чтобы они прочитали руководство
 """
 
 ASQ_LOCK = Lock()
 PING_LOCK = Lock()
 
 
-@app2.on_message(
-    filters.command("ping", prefixes=USERBOT_PREFIX)
-    & ~filters.edited
-)
-@app.on_message(filters.command("ping") & ~filters.edited)
-async def ping_handler(_, message):
-    m = await eor(message, text="Pinging datacenters...")
-    async with PING_LOCK:
-        ips = {
-            "dc1": "149.154.175.53",
-            "dc2": "149.154.167.51",
-            "dc3": "149.154.175.100",
-            "dc4": "149.154.167.91",
-            "dc5": "91.108.56.130",
-        }
-        text = "**Pings:**\n"
-
-        for dc, ip in ips.items():
-            try:
-                shell = subprocess.run(
-                    ["ping", "-c", "1", "-W", "2", ip],
-                    text=True,
-                    check=True,
-                    capture_output=True
-                )
-                resp_time = findall(r"time=.+m?s", shell.stdout, re.MULTILINE)[
-                    0].replace(
-                    "time=", ""
-                )
-
-                text += f"    **{dc.upper()}:** {resp_time} ✅\n"
-            except Exception:
-                # There's a cross emoji here, but it's invisible.
-                text += f"    **{dc.upper}:** ❌\n"
-        await m.edit(text)
-
-
 @app.on_message(filters.command("asq") & ~filters.edited)
 async def asq(_, message):
-    err = "Reply to text message or pass the question as argument"
+    err = "Ответьте на текстовое сообщение или передайте вопрос в качестве аргумента"
     if message.reply_to_message:
         if not message.reply_to_message.text:
             return await message.reply(err)
@@ -149,7 +103,7 @@ async def asq(_, message):
         if len(message.command) < 2:
             return await message.reply(err)
         question = message.text.split(None, 1)[1]
-    m = await message.reply("Thinking...")
+    m = await message.reply("Думаю...")
     async with ASQ_LOCK:
         resp = await arq.asq(question)
         await m.edit(resp.result)
@@ -164,9 +118,9 @@ async def commit(_, message):
 async def rtfm(_, message):
     await message.delete()
     if not message.reply_to_message:
-        return await message.reply_text("Reply To A Message lol")
+        return await message.reply_text("Ответь на сообщение, лол")
     await message.reply_to_message.reply_text(
-        "Are You Lost? READ THE FUCKING DOCS!"
+        "Вы потерялись? ПРОЧИТАЙТЕ БЛЯДЬ ДОКУМЕНТЫ!"
     )
 
 
@@ -183,8 +137,8 @@ async def getid(client, message):
     message_id = message.message_id
     reply = message.reply_to_message
 
-    text = f"**[Message ID:]({message.link})** `{message_id}`\n"
-    text += f"**[Your ID:](tg://user?id={your_id})** `{your_id}`\n"
+    text = f"**[ИД сообщения:]({message.link})** `{message_id}`\n"
+    text += f"**[Ваш ИД:](tg://user?id={your_id})** `{your_id}`\n"
 
     if not message.command:
         message.command = message.text.split()
@@ -195,15 +149,15 @@ async def getid(client, message):
             user_id = (await client.get_users(split)).id
             text += f"**[User ID:](tg://user?id={user_id})** `{user_id}`\n"
         except Exception:
-            return await eor(message, text="This user doesn't exist.")
+            return await eor(message, text="Этот пользователь не существует.")
 
-    text += f"**[Chat ID:](https://t.me/{chat.username})** `{chat.id}`\n\n"
+    text += f"**[ИД Чата:](https://t.me/{chat.username})** `{chat.id}`\n\n"
     if not getattr(reply, "empty", True):
         id_ = reply.from_user.id if reply.from_user else reply.sender_chat.id
         text += (
-            f"**[Replied Message ID:]({reply.link})** `{reply.message_id}`\n"
+            f"**[ИД отвеченного сообщения:]({reply.link})** `{reply.message_id}`\n"
         )
-        text += f"**[Replied User ID:](tg://user?id={id_})** `{id_}`"
+        text += f"**[ИД ответившего пользователя:](tg://user?id={id_})** `{id_}`"
 
     await eor(
         message,
@@ -219,7 +173,7 @@ async def getid(client, message):
 async def random(_, message):
     if len(message.command) != 2:
         return await message.reply_text(
-            '"/random" Needs An Argurment.' " Ex: `/random 5`"
+            '"/random" Нужен аргумент.' " Пример: `/random 5`"
         )
     length = message.text.split(None, 1)[1]
     try:
@@ -230,10 +184,10 @@ async def random(_, message):
             )
             await message.reply_text(f"`{password}`")
         else:
-            await message.reply_text("Specify A Length Between 1-1000")
+            await message.reply_text("Укажите длину между 1-1000")
     except ValueError:
         await message.reply_text(
-            "Strings Won't Work!, Pass A Positive Integer Less Than 1000"
+            "Строки не работают! Передайте положительное целое число меньше чем 1000"
         )
 
 
@@ -246,15 +200,15 @@ async def tr(_, message):
     lang = message.text.split(None, 1)[1]
     if not message.reply_to_message or not lang:
         return await message.reply_text(
-            "Reply to a message with /tr [language code]"
-            + "\nGet supported language list from here -"
+            "Ответите на сообщение с /tr [language code]"
+            + "\nПолучите список поддерживаемых языков отсюда -"
             + " https://py-googletrans.readthedocs.io/en"
             + "/latest/#googletrans-languages"
         )
     reply = message.reply_to_message
     text = reply.text or reply.caption
     if not text:
-        return await message.reply_text("Reply to a text to translate it")
+        return await message.reply_text("Ответьте на сообщение, чтобы перевести его")
     result = await arq.translate(text, lang)
     if not result.ok:
         return await message.reply_text(result.result)
@@ -267,7 +221,7 @@ async def json_fetch(_, message):
     if len(message.command) != 2:
         return await message.reply_text("/json [URL]")
     url = message.text.split(None, 1)[1]
-    m = await message.reply_text("Fetching")
+    m = await message.reply_text("Получение")
     try:
         data = await get(url)
         data = await json_prettify(data)
@@ -286,5 +240,5 @@ async def json_fetch(_, message):
 @app.on_message(filters.command(["kickme", "banme"]))
 async def kickbanme(_, message):
     await message.reply_text(
-        "Haha, it doesn't work that way, You're stuck with everyone here."
+        "Ха-ха, это так не работает, ты застрял здесь со всеми."
     )

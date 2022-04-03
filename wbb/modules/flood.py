@@ -40,11 +40,11 @@ from wbb.modules.admin import list_admins, member_permissions
 from wbb.utils.dbfunctions import flood_off, flood_on, is_flood_on
 from wbb.utils.filter_groups import flood_group
 
-__MODULE__ = "Flood"
+__MODULE__ = "Флуд"
 __HELP__ = """
-Anti-Flood system, the one who sends more than 10 messages in a row, gets muted for an hour (Except for admins).
+Система Антифлуд, тот, кто отправляет более 10 сообщений подряд, получает блокировку на час (Кроме админов).
 
-/flood [ENABLE|DISABLE] - Turn flood detection on or off
+/flood [ENABLE|DISABLE] - Включить или отключить обнаружение флуда
 """
 
 DB = {}  # TODO Use mongodb instead of a fucking dict.
@@ -109,14 +109,14 @@ async def flood_control_func(_, message: Message):
             [
                 [
                     InlineKeyboardButton(
-                        text="🚨   Unmute   🚨",
+                        text="🚨   Снять мут   🚨",
                         callback_data=f"unmute_{user_id}",
                     )
                 ]
             ]
         )
         m = await message.reply_text(
-            f"Imagine flooding the chat in front of me, Muted {mention} for an hour!",
+            f"Представьте, что вы зафлуживаете чат передо мной, выдан мут {mention} на час!",
             reply_markup=keyboard,
         )
 
@@ -139,15 +139,15 @@ async def flood_callback_func(_, cq: CallbackQuery):
     permission = "can_restrict_members"
     if permission not in permissions:
         return await cq.answer(
-            "You don't have enough permissions to perform this action.\n"
-            + f"Permission needed: {permission}",
+            "У вас недостаточно прав для выполнения этого действия.\n"
+            + f"Нужные права: {permission}",
             show_alert=True,
         )
     user_id = cq.data.split("_")[1]
     await cq.message.chat.unban_member(user_id)
     text = cq.message.text.markdown
     text = f"~~{text}~~\n\n"
-    text += f"__User unmuted by {from_user.mention}__"
+    text += f"__Пользователю снял мут {from_user.mention}__"
     await cq.message.edit(text)
 
 
@@ -161,9 +161,9 @@ async def flood_toggle(_, message: Message):
     chat_id = message.chat.id
     if status == "enable":
         await flood_on(chat_id)
-        await message.reply_text("Enabled Flood Checker.")
+        await message.reply_text("Включена проверка флуда.")
     elif status == "disable":
         await flood_off(chat_id)
-        await message.reply_text("Disabled Flood Checker.")
+        await message.reply_text("Отключена проверка флуда.")
     else:
-        await message.reply_text("Unknown Suffix, Use /flood [ENABLE|DISABLE]")
+        await message.reply_text("Неизвестный суффикс, Используйте /flood [ENABLE|DISABLE]")

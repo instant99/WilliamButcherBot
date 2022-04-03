@@ -37,14 +37,14 @@ from wbb.utils.dbfunctions import (
 )
 from wbb.utils.functions import extract_text_and_keyb
 
-__MODULE__ = "Notes"
-__HELP__ = """/notes To Get All The Notes In The Chat.
+__MODULE__ = "Заметки"
+__HELP__ = """/notes Получить список заметок в чате.
 
-/save [NOTE_NAME] To Save A Note (Can be a sticker or text).
+/save [NOTE_NAME] Сохранить заметку в чате (Может быть стикером или текстом).
 
-#NOTE_NAME To Get A Note.
+#NOTE_NAME Чтобы получить заметку.
 
-/delete [NOTE_NAME] To Delete A Note.
+/delete [NOTE_NAME] Удалить заметку.
 
 Checkout /markdownhelp to know more about formattings and other syntax.
 """
@@ -57,7 +57,7 @@ async def save_notee(_, message):
     if len(message.command) < 2 or not message.reply_to_message:
         await eor(
             message,
-            text="**Usage:**\nReply to a text or sticker with /save [NOTE_NAME] to save it.",
+            text="**Применение:**\nОтветьте на сообщение или стикер с помощью /save [NOTE_NAME] что бы сохранить ее.",
         )
 
     elif (
@@ -66,12 +66,12 @@ async def save_notee(_, message):
     ):
         await eor(
             message,
-            text="__**You can only save text or stickers in notes.**__",
+            text="__**В заметках можно сохранять только текст или стикеры.**__",
         )
     else:
         name = message.text.split(None, 1)[1].strip()
         if not name:
-            return await eor(message, text="**Usage**\n__/save [NOTE_NAME]__")
+            return await eor(message, text="**Применение**\n__/save [NOTE_NAME]__")
         _type = "text" if message.reply_to_message.text else "sticker"
         note = {
             "type": _type,
@@ -82,7 +82,7 @@ async def save_notee(_, message):
         prefix = message.text.split()[0][0]
         chat_id = message.chat.id if prefix != USERBOT_PREFIX else USERBOT_ID
         await save_note(chat_id, name, note)
-        await eor(message, text=f"__**Saved note {name}.**__")
+        await eor(message, text=f"__**🗒 Заметка {name} была успешно сохранена.**__")
 
 
 @app2.on_message(filters.command("notes", prefixes=USERBOT_PREFIX) & SUDOERS)
@@ -96,9 +96,9 @@ async def get_notes(_, message):
     _notes = await get_note_names(chat_id)
 
     if not _notes:
-        return await eor(message, text="**No notes in this chat.**")
+        return await eor(message, text="**В этом чате нет заметок.**")
     _notes.sort()
-    msg = f"List of notes in {'USERBOT' if is_ubot else message.chat.title}\n"
+    msg = f"Список заметок в чате {'USERBOT' if is_ubot else message.chat.title}\n"
     for note in _notes:
         msg += f"**-** `{note}`\n"
     await eor(message, text=msg)
@@ -107,13 +107,13 @@ async def get_notes(_, message):
 @app2.on_message(filters.command("get", prefixes=USERBOT_PREFIX) & SUDOERS)
 async def get_one_note_userbot(_, message):
     if len(message.text.split()) < 2:
-        return await eor(message, text="Invalid arguments")
+        return await eor(message, text="Недопустимые аргументы")
 
     name = message.text.split(None, 1)[1]
 
     _note = await get_note(USERBOT_ID, name)
     if not _note:
-        return await eor(message, text="No such note.")
+        return await eor(message, text="Нет такой заметки.")
 
     if _note["type"] == "text":
         data = _note["data"]
@@ -158,10 +158,10 @@ async def get_one_note(_, message):
 @adminsOnly("can_change_info")
 async def del_note(_, message):
     if len(message.command) < 2:
-        return await eor(message, text="**Usage**\n__/delete [NOTE_NAME]__")
+        return await eor(message, text="**Применение**\n__/delete [NOTE_NAME]__")
     name = message.text.split(None, 1)[1].strip()
     if not name:
-        return await eor(message, text="**Usage**\n__/delete [NOTE_NAME]__")
+        return await eor(message, text="**Применение**\n__/delete [NOTE_NAME]__")
 
     prefix = message.text.split()[0][0]
     is_ubot = bool(prefix == USERBOT_PREFIX)
@@ -169,6 +169,6 @@ async def del_note(_, message):
 
     deleted = await delete_note(chat_id, name)
     if deleted:
-        await eor(message, text=f"**Deleted note {name} successfully.**")
+        await eor(message, text=f"**🗒 Заметка {name} успешно удалена.**")
     else:
-        await eor(message, text="**No such note.**")
+        await eor(message, text="**Заметка отсутствует.**")

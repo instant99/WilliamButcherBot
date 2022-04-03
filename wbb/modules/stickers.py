@@ -51,17 +51,17 @@ from wbb.utils.stickerset import (
     get_sticker_set_by_name,
 )
 
-__MODULE__ = "Stickers"
+__MODULE__ = "Стикеры"
 __HELP__ = """
 /sticker_id
-    To get FileID of a Sticker.
+    Получить FileID стикера.
 /get_sticker
-    To get sticker as a photo and document.
+    Получить стикер в виде фото и документа.
 /kang
-    To kang a Sticker or an Image."""
+    Добавить стикер или фото в свой набор стикеров."""
 
 MAX_STICKERS = (
-    120  # would be better if we could fetch this limit directly from telegram
+    120  # было бы лучше, если бы мы могли получить этот лимит прямо из телеграммы
 )
 SUPPORTED_TYPES = ["jpeg", "png", "webp"]
 
@@ -72,10 +72,10 @@ async def sticker_id(_, message: Message):
     reply = message.reply_to_message
 
     if not reply:
-        return await message.reply("Reply to a sticker.")
+        return await message.reply("Ответьте на стикер.")
 
     if not reply.sticker:
-        return await message.reply("Reply to a sticker.")
+        return await message.reply("Ответьте на стикер.")
 
     await message.reply_text(f"`{reply.sticker.file_id}`")
 
@@ -86,12 +86,12 @@ async def sticker_image(_, message: Message):
     r = message.reply_to_message
 
     if not r:
-        return await message.reply("Reply to a sticker.")
+        return await message.reply("Ответьте на стикер.")
 
     if not r.sticker:
-        return await message.reply("Reply to a sticker.")
+        return await message.reply("Ответьте на стикер.")
 
-    m = await message.reply("Sending..")
+    m = await message.reply("Отправка..")
     f = await r.download(f"{r.sticker.file_unique_id}.png")
 
     await gather(
@@ -112,7 +112,7 @@ async def userbot_kang(_, message: Message):
     reply = message.reply_to_message
 
     if not reply:
-        return await message.reply_text("Reply to a sticker/image to kang it.")
+        return await message.reply_text("Ответьте на стикер/изображение, чтобы добавить его в набор.")
 
     sticker_m = await reply.forward(BOT_USERNAME)
 
@@ -141,12 +141,12 @@ async def userbot_kang(_, message: Message):
 @capture_err
 async def kang(client, message: Message):
     if not message.reply_to_message:
-        return await message.reply_text("Reply to a sticker/image to kang it.")
+        return await message.reply_text("Ответьте на стикер/изображение, чтобы добавить его в набор.")
     if not message.from_user:
         return await message.reply_text(
-            "You are anon admin, kang stickers in my pm."
+            "Ты анон админ, кан стикеры отправлены в личку."
         )
-    msg = await message.reply_text("Kanging Sticker..")
+    msg = await message.reply_text("Подготовка стикера..")
 
     # Find the proper emoji
     args = message.text.split()
@@ -172,22 +172,22 @@ async def kang(client, message: Message):
             )
         elif doc:
             if doc.file_size > 10000000:
-                return await msg.edit("File size too large.")
+                return await msg.edit("Слишком большой размер файла.")
 
             temp_file_path = await app.download_media(doc)
             image_type = imghdr.what(temp_file_path)
             if image_type not in SUPPORTED_TYPES:
                 return await msg.edit(
-                    "Format not supported! ({})".format(image_type)
+                    "Формат не поддерживается! ({})".format(image_type)
                 )
             try:
                 temp_file_path = await resize_file_to_sticker_size(
                     temp_file_path
                 )
             except OSError as e:
-                await msg.edit_text("Something wrong happened.")
+                await msg.edit_text("Произошло что-то не так.")
                 raise Exception(
-                    f"Something went wrong while resizing the sticker (at {temp_file_path}); {e}"
+                    f"Что-то пошло не так при изменении размера стикера(at {temp_file_path}); {e}"
                 )
             sticker = await create_sticker(
                 await upload_document(client, temp_file_path, message.chat.id),
@@ -196,9 +196,9 @@ async def kang(client, message: Message):
             if os.path.isfile(temp_file_path):
                 os.remove(temp_file_path)
         else:
-            return await msg.edit("Nope, can't kang that.")
+            return await msg.edit("Нет, не могу сделать это.")
     except ShortnameOccupyFailed:
-        await message.reply_text("Change Your Name Or Username")
+        await message.reply_text("Изменить свое имя или имя пользователя")
         return
 
     except Exception as e:
@@ -256,12 +256,12 @@ async def kang(client, message: Message):
             [[InlineKeyboardButton(text="Start", url=f"t.me/{BOT_USERNAME}")]]
         )
         await msg.edit(
-            "You Need To Start A Private Chat With Me.",
+            "Вам нужно начать приватный чат со мной.",
             reply_markup=keyboard,
         )
     except StickerPngNopng:
         await message.reply_text(
-            "Stickers must be png files but the provided image was not a png"
+            "Стикеры должны быть в формате png, но предоставленное изображение не было png"
         )
     except StickerPngDimensions:
-        await message.reply_text("The sticker png dimensions are invalid.")
+        await message.reply_text("Размеры стикера png недействительны.")

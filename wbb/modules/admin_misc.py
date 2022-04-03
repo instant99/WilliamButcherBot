@@ -28,11 +28,11 @@ from pyrogram import filters
 from wbb import app
 from wbb.core.decorators.permissions import adminsOnly
 
-__MODULE__ = "Admin Miscs"
+__MODULE__ = "Разное админам"
 __HELP__ = """
-/set_chat_title - Change The Name Of A Group/Channel.
-/set_chat_photo - Change The PFP Of A Group/Channel.
-/set_user_title - Change The Administrator Title Of An Admin.
+/set_chat_title - Изменить название группы/канала.
+/set_chat_photo - Изменить фото группы/канала.
+/set_user_title - Изменить титул администратора администратора.
 """
 
 
@@ -40,12 +40,12 @@ __HELP__ = """
 @adminsOnly("can_change_info")
 async def set_chat_title(_, message):
     if len(message.command) < 2:
-        return await message.reply_text("**Usage:**\n/set_chat_title NEW NAME")
+        return await message.reply_text("**Используйте:**\n/set_chat_title новое имя")
     old_title = message.chat.title
     new_title = message.text.split(None, 1)[1]
     await message.chat.set_title(new_title)
     await message.reply_text(
-        f"Successfully Changed Group Title From {old_title} To {new_title}"
+        f"Название группы успешно изменено с {old_title} на {new_title}"
     )
 
 
@@ -54,22 +54,22 @@ async def set_chat_title(_, message):
 async def set_user_title(_, message):
     if not message.reply_to_message:
         return await message.reply_text(
-            "Reply to user's message to set his admin title"
+            "Ответьте на сообщение пользователя, чтобы установить его титул администратора"
         )
     if not message.reply_to_message.from_user:
         return await message.reply_text(
-            "I can't change admin title of an unknown entity"
+            "Я не могу изменить титул администратора неизвестному лицу"
         )
     chat_id = message.chat.id
     from_user = message.reply_to_message.from_user
     if len(message.command) < 2:
         return await message.reply_text(
-            "**Usage:**\n/set_user_title NEW ADMINISTRATOR TITLE"
+            "**Используйте:**\n/set_user_title НОВЫЙ ТИТУЛ АДМИНА"
         )
     title = message.text.split(None, 1)[1]
     await app.set_administrator_title(chat_id, from_user.id, title)
     await message.reply_text(
-        f"Successfully Changed {from_user.mention}'s Admin Title To {title}"
+        f"Успешно изменено {from_user.mention} должность администратора {title}"
     )
 
 
@@ -80,19 +80,19 @@ async def set_chat_photo(_, message):
 
     if not reply:
         return await message.reply_text(
-            "Reply to a photo to set it as chat_photo"
+            "Ответьте на фото, чтобы установить его как фото в чате"
         )
 
     file = reply.document or reply.photo
     if not file:
         return await message.reply_text(
-            "Reply to a photo or document to set it as chat_photo"
+            "Ответьте на фотографию или документ, чтобы установить его как фото в чате"
         )
 
     if file.file_size > 5000000:
-        return await message.reply("File size too large.")
+        return await message.reply("Слишком большой размер файла.")
 
     photo = await reply.download()
     await message.chat.set_photo(photo)
-    await message.reply_text("Successfully Changed Group Photo")
+    await message.reply_text("Фото группы успешно изменено")
     os.remove(photo)

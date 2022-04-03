@@ -61,7 +61,7 @@ async def take_screenshot(url: str, full: bool = False):
 @capture_err
 async def take_ss(_, message: Message):
     if len(message.command) < 2:
-        return await eor(message, text="Give A Url To Fetch Screenshot.")
+        return await eor(message, text="Укажите Url-Адрес Для Получения Скриншота.")
 
     if len(message.command) == 2:
         url = message.text.split(None, 1)[1]
@@ -75,16 +75,16 @@ async def take_ss(_, message: Message):
             "true",
         ]
     else:
-        return await eor(message, text="Invalid Command.")
+        return await eor(message, text="Недопустимая команда.")
 
-    m = await eor(message, text="Capturing screenshot...")
+    m = await eor(message, text="Захват скриншота...")
 
     try:
         photo = await take_screenshot(url, full)
         if not photo:
-            return await m.edit("Failed To Take Screenshot")
+            return await m.edit("Ошибка получения скриншота")
 
-        m = await m.edit("Uploading...")
+        m = await m.edit("Загрузка...")
 
         if not full:
             # Full size images have problem with reply_photo, that's why

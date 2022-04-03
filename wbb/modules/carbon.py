@@ -34,15 +34,15 @@ from wbb.utils.functions import make_carbon
 async def carbon_func(_, message):
     if not message.reply_to_message:
         return await message.reply_text(
-            "Reply to a text message to make carbon."
+            "Ответьте на текстовое сообщение, чтобы сделать его карбоновым."
         )
     if not message.reply_to_message.text:
         return await message.reply_text(
-            "Reply to a text message to make carbon."
+            "Ответьте на текстовое сообщение, чтобы сделать его карбоновым."
         )
-    m = await message.reply_text("Preparing Carbon")
+    m = await message.reply_text("Подготовка карбона")
     carbon = await make_carbon(message.reply_to_message.text)
-    await m.edit("Uploading")
+    await m.edit("Загрузка")
     await app.send_document(message.chat.id, carbon)
     await m.delete()
     carbon.close()

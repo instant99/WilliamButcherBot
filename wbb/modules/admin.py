@@ -1,7 +1,7 @@
 """
 MIT License
 
-Copyright (c) 2021 TheHamkerCat
+2022 Ghost552
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -48,29 +48,29 @@ from wbb.utils.functions import (
     time_converter,
 )
 
-__MODULE__ = "Admin"
-__HELP__ = """/ban - Ban A User
-/dban - Delete the replied message banning its sender
-/tban - Ban A User For Specific Time
-/unban - Unban A User
-/warn - Warn A User
-/dwarn - Delete the replied message warning its sender
-/rmwarns - Remove All Warning of A User
-/warns - Show Warning Of A User
-/kick - Kick A User
-/dkick - Delete the replied message kicking its sender
-/purge - Purge Messages
-/del - Delete Replied Message
-/promote - Promote A Member
-/fullpromote - Promote A Member With All Rights
-/demote - Demote A Member
-/pin - Pin A Message
-/mute - Mute A User
-/tmute - Mute A User For Specific Time
-/unmute - Unmute A User
-/ban_ghosts - Ban Deleted Accounts
-/report | @admins | @admin - Report A Message To Admins.
-/admincache - Reload admin list"""
+__MODULE__ = "Админам"
+__HELP__ = """/ban - Забанить пользователя
+/dban - Удалить сообщение на которое вы ответили, и забанить пользователя
+/tban - Забанить на определенное время
+/unban - Разбанить пользователя
+/warn - Выдать варн пользователю
+/dwarn - Удалить сообщение на которое вы ответили, и заварнить пользователя
+/rmwarns - Удалить предупреждения у пользователя
+/warns - Посмотреть список варном
+/kick - Кикнуть пользователя
+/dkick - Кикнуть пользователя и удалить его сообщение
+/purge - Удалить сообщения
+/del - Удалить сообщение на которое будете отвечать
+/promote - Повысить пользователя в должности
+/fullpromote - Полностью повысить пользователя в должности (Все права)
+/demote - Понизить пользователя
+/pin - Закрепить сообщение
+/mute - Выдать мут пользователю
+/tmute - Выдать временный мут пользователю
+/unmute - Снять мут пользователю
+/ban_ghosts - Забанить удаленные аккаунты
+/report | @admins | @admin - Кинуть репорт админам.
+/admincache - Перезагрузить список админов"""
 
 
 async def member_permissions(chat_id: int, user_id: int):
@@ -162,7 +162,7 @@ async def admin_cache_func(_, cmu: ChatMemberUpdated):
                 )
             ],
         }
-        log.info(f"Updated admin cache for {cmu.chat.id} [{cmu.chat.title}]")
+        log.info(f"Список админов обновлен в чате {cmu.chat.id} [{cmu.chat.title}]")
 
 
 # Purge Messages
@@ -215,22 +215,22 @@ async def purgeFunc(_, message: Message):
 async def kickFunc(_, message: Message):
     user_id, reason = await extract_user_and_reason(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("Я не могу найти этого пользователя.")
     if user_id == BOT_ID:
         return await message.reply_text(
-            "I can't kick myself, i can leave if you want."
+            "Вместо того, чтобы пытаться выкинуть меня, ты мог бы тратить своё время лучше. Это просто скучно."
         )
     if user_id in SUDOERS:
-        return await message.reply_text("You Wanna Kick The Elevated One?")
+        return await message.reply_text("Выкинуть админа — это не лучшая идея")
     if user_id in (await list_admins(message.chat.id)):
         return await message.reply_text(
-            "I can't kick an admin, You know the rules, so do i."
+            "Я не могу выгнать админа, ты знаешь правила, я тоже."
         )
     mention = (await app.get_users(user_id)).mention
     msg = f"""
-**Kicked User:** {mention}
-**Kicked By:** {message.from_user.mention if message.from_user else 'Anon'}
-**Reason:** {reason or 'No Reason Provided.'}"""
+**Кикнут:** {mention}
+**Выдал наказание:** {message.from_user.mention if message.from_user else 'Anon'}
+**Причина:** {reason or 'Причина не указана.'}"""
     if message.command[0][0] == "d":
         await message.reply_to_message.delete()
     await message.chat.ban_member(user_id)
@@ -252,18 +252,18 @@ async def banFunc(_, message: Message):
     user_id, reason = await extract_user_and_reason(message, sender_chat=True)
 
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("Я не смог найти пользователя!")
     if user_id == BOT_ID:
         return await message.reply_text(
-            "I can't ban myself, i can leave if you want."
+            "Нет, я не сделаю этого! Проси создателя чата сделать это!"
         )
     if user_id in SUDOERS:
         return await message.reply_text(
-            "You Wanna Ban The Elevated One?, RECONSIDER!"
+            "Может сначала я забаню тебя?"
         )
     if user_id in (await list_admins(message.chat.id)):
         return await message.reply_text(
-            "I can't ban an admin, You know the rules, so do i."
+            "Хах, давай сначала сделаем ему <code>/demote</code>."
         )
 
     try:
@@ -276,8 +276,8 @@ async def banFunc(_, message: Message):
         )
 
     msg = (
-        f"**Banned User:** {mention}\n"
-        f"**Banned By:** {message.from_user.mention if message.from_user else 'Anon'}\n"
+        f"**Забанен пользователь:** {mention}\n"
+        f"**Выдал наказание:** {message.from_user.mention if message.from_user else 'Anon'}\n"
     )
     if message.command[0][0] == "d":
         await message.reply_to_message.delete()
@@ -286,20 +286,20 @@ async def banFunc(_, message: Message):
         time_value = split[0]
         temp_reason = split[1] if len(split) > 1 else ""
         temp_ban = await time_converter(message, time_value)
-        msg += f"**Banned For:** {time_value}\n"
+        msg += f"**Забанен на:** {time_value}\n"
         if temp_reason:
-            msg += f"**Reason:** {temp_reason}"
+            msg += f"**Причина:** {temp_reason}"
         try:
             if len(time_value[:-1]) < 3:
                 await message.chat.ban_member(user_id, until_date=temp_ban)
                 await message.reply_text(msg)
             else:
-                await message.reply_text("You can't use more than 99")
+                await message.reply_text("Нельзя использовать число больше 99")
         except AttributeError:
             pass
         return
     if reason:
-        msg += f"**Reason:** {reason}"
+        msg += f"**Причина:** {reason}"
     await message.chat.ban_member(user_id)
     await message.reply_text(msg)
 
@@ -325,11 +325,11 @@ async def unban_func(_, message: Message):
         user = message.reply_to_message.from_user.id
     else:
         return await message.reply_text(
-            "Provide a username or reply to a user's message to unban."
+            "Укажите имя пользователя или ответьте на сообщение пользователя, чтобы разбанить."
         )
     await message.chat.unban_member(user)
     umention = (await app.get_users(user)).mention
-    await message.reply_text(f"Unbanned! {umention}")
+    await message.reply_text(f"Разбанен! {umention}")
 
 
 # Delete messages
@@ -339,7 +339,7 @@ async def unban_func(_, message: Message):
 @adminsOnly("can_delete_messages")
 async def deleteFunc(_, message: Message):
     if not message.reply_to_message:
-        return await message.reply_text("Reply To A Message To Delete It")
+        return await message.reply_text("Ответьте на сообщение, чтобы удалить его")
     await message.reply_to_message.delete()
     await message.delete()
 
@@ -357,12 +357,12 @@ async def promoteFunc(_, message: Message):
     user_id = await extract_user(message)
     umention = (await app.get_users(user_id)).mention
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("Я не могу найти этого пользователя.")
     bot = await app.get_chat_member(message.chat.id, BOT_ID)
     if user_id == BOT_ID:
-        return await message.reply_text("I can't promote myself.")
+        return await message.reply_text("Я не могу повысить себя")
     if not bot.can_promote_members:
-        return await message.reply_text("I don't have enough permissions")
+        return await message.reply_text("Повышение не удалось! Проверьте, имею ли я права для этого")
     if message.command[0][0] == "f":
         await message.chat.promote_member(
             user_id=user_id,
@@ -375,7 +375,7 @@ async def promoteFunc(_, message: Message):
             can_manage_chat=bot.can_manage_chat,
             can_manage_voice_chats=bot.can_manage_voice_chats,
         )
-        return await message.reply_text(f"Fully Promoted! {umention}")
+        return await message.reply_text(f"Полностью повышен: {umention}")
 
     await message.chat.promote_member(
         user_id=user_id,
@@ -388,7 +388,7 @@ async def promoteFunc(_, message: Message):
         can_manage_chat=bot.can_manage_chat,
         can_manage_voice_chats=bot.can_manage_voice_chats,
     )
-    await message.reply_text(f"Promoted! {umention}")
+    await message.reply_text(f"Пользователь {umention} был повышен")
 
 
 # Demote Member
@@ -399,12 +399,12 @@ async def promoteFunc(_, message: Message):
 async def demote(_, message: Message):
     user_id = await extract_user(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("Я не могу найти этого пользователя.")
     if user_id == BOT_ID:
-        return await message.reply_text("I can't demote myself.")
+        return await message.reply_text("Я не могу позинить себя.")
     if user_id in SUDOERS:
         return await message.reply_text(
-            "You wanna demote the elevated one?, RECONSIDER!"
+            "Может сначала я сниму тебя?"
         )
     await message.chat.promote_member(
         user_id=user_id,
@@ -418,7 +418,7 @@ async def demote(_, message: Message):
         can_manage_voice_chats=False,
     )
     umention = (await app.get_users(user_id)).mention
-    await message.reply_text(f"Demoted! {umention}")
+    await message.reply_text(f"Пользователь {umention} был понижен")
 
 
 # Pin Messages
@@ -430,7 +430,7 @@ async def demote(_, message: Message):
 @adminsOnly("can_pin_messages")
 async def pin(_, message: Message):
     if not message.reply_to_message:
-        return await message.reply_text("Reply to a message to pin/unpin it.")
+        return await message.reply_text("Ответьте на сообщение, чтобы закрепить/открепить его!")
     r = message.reply_to_message
     if message.command[0][0] == "u":
         await r.unpin()
@@ -458,31 +458,31 @@ async def pin(_, message: Message):
 async def mute(_, message: Message):
     user_id, reason = await extract_user_and_reason(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("Я не могу найти этого пользователя.")
     if user_id == BOT_ID:
-        return await message.reply_text("I can't mute myself.")
+        return await message.reply_text("На самом деле, меня не заткнуть.")
     if user_id in SUDOERS:
         return await message.reply_text(
-            "You wanna mute the elevated one?, RECONSIDER!"
+            "Может я сначала заткну тебя?"
         )
     if user_id in (await list_admins(message.chat.id)):
         return await message.reply_text(
-            "I can't mute an admin, You know the rules, so do i."
+            "Если вы думаете, что можете заткнуть админа, вы сильно ошибаетесь!"
         )
     mention = (await app.get_users(user_id)).mention
-    keyboard = ikb({"🚨   Unmute   🚨": f"unmute_{user_id}"})
+    keyboard = ikb({"🚨   Снять мут   🚨": f"unmute_{user_id}"})
     msg = (
-        f"**Muted User:** {mention}\n"
-        f"**Muted By:** {message.from_user.mention if message.from_user else 'Anon'}\n"
+        f"**Замучен пользователь:** {mention}\n"
+        f"**Выдал наказание:** {message.from_user.mention if message.from_user else 'Anon'}\n"
     )
     if message.command[0] == "tmute":
         split = reason.split(None, 1)
         time_value = split[0]
         temp_reason = split[1] if len(split) > 1 else ""
         temp_mute = await time_converter(message, time_value)
-        msg += f"**Muted For:** {time_value}\n"
+        msg += f"**Срок наказания:** {time_value}\n"
         if temp_reason:
-            msg += f"**Reason:** {temp_reason}"
+            msg += f"**Причина:** {temp_reason}"
         try:
             if len(time_value[:-1]) < 3:
                 await message.chat.restrict_member(
@@ -492,12 +492,12 @@ async def mute(_, message: Message):
                 )
                 await message.reply_text(msg, reply_markup=keyboard)
             else:
-                await message.reply_text("You can't use more than 99")
+                await message.reply_text("Нельзя использовать число больше 99")
         except AttributeError:
             pass
         return
     if reason:
-        msg += f"**Reason:** {reason}"
+        msg += f"**Причина:** {reason}"
     await message.chat.restrict_member(user_id, permissions=ChatPermissions())
     await message.reply_text(msg, reply_markup=keyboard)
 
@@ -510,10 +510,10 @@ async def mute(_, message: Message):
 async def unmute(_, message: Message):
     user_id = await extract_user(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("Я не могу найти этого пользователя.")
     await message.chat.unban_member(user_id)
     umention = (await app.get_users(user_id)).mention
-    await message.reply_text(f"Unmuted! {umention}")
+    await message.reply_text(f"Пользователь {umention} был размучен")
 
 
 # Ban deleted accounts
@@ -525,7 +525,7 @@ async def ban_deleted_accounts(_, message: Message):
     chat_id = message.chat.id
     deleted_users = []
     banned_users = 0
-    m = await message.reply("Finding ghosts...")
+    m = await message.reply("Поиск призраков...")
 
     async for i in app.iter_chat_members(chat_id):
         if i.user.is_deleted:
@@ -537,9 +537,9 @@ async def ban_deleted_accounts(_, message: Message):
             except Exception:
                 pass
             banned_users += 1
-        await m.edit(f"Banned {banned_users} Deleted Accounts")
+        await m.edit(f"Забанено {banned_users} удаленных аккаунтов")
     else:
-        await m.edit("There are no deleted accounts in this chat")
+        await m.edit("В этом чате нет удаленных аккаунтов")
 
 
 @app.on_message(
@@ -550,25 +550,25 @@ async def warn_user(_, message: Message):
     user_id, reason = await extract_user_and_reason(message)
     chat_id = message.chat.id
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("Я не могу найти этого пользователя.")
     if user_id == BOT_ID:
         return await message.reply_text(
-            "I can't warn myself, i can leave if you want."
+            "Хаха невозможно дать предупреждение самому себе!"
         )
     if user_id in SUDOERS:
         return await message.reply_text(
-            "You Wanna Warn The Elevated One?, RECONSIDER!"
+            "Может я сначала выдам варн тебе?"
         )
     if user_id in (await list_admins(chat_id)):
         return await message.reply_text(
-            "I can't warn an admin, You know the rules, so do i."
+            "Ты серьёзно? Ты не можешь дать предупреждение админу."
         )
     user, warns = await asyncio.gather(
         app.get_users(user_id),
         get_warn(chat_id, await int_to_alpha(user_id)),
     )
     mention = user.mention
-    keyboard = ikb({"🚨  Remove Warn  🚨": f"unwarn_{user_id}"})
+    keyboard = ikb({"🚨  Снять варн  🚨": f"unwarn_{user_id}"})
     if warns:
         warns = warns["warns"]
     else:
@@ -584,10 +584,10 @@ async def warn_user(_, message: Message):
     else:
         warn = {"warns": warns + 1}
         msg = f"""
-**Warned User:** {mention}
-**Warned By:** {message.from_user.mention if message.from_user else 'Anon'}
-**Reason:** {reason or 'No Reason Provided.'}
-**Warns:** {warns + 1}/3"""
+**Заварнен:** {mention}
+**Выдал наказание:** {message.from_user.mention if message.from_user else 'Anon'}
+**Причина:** {reason or 'Причина не указана.'}
+**Варнов:** {warns + 1}/3"""
         await message.reply_text(msg, reply_markup=keyboard)
         await add_warn(chat_id, await int_to_alpha(user_id), warn)
 
@@ -600,8 +600,8 @@ async def remove_warning(_, cq: CallbackQuery):
     permission = "can_restrict_members"
     if permission not in permissions:
         return await cq.answer(
-            "You don't have enough permissions to perform this action.\n"
-            + f"Permission needed: {permission}",
+            "У вас недостаточно прав для выполнения этого действия.\n"
+            + f"Нужное разрешение: {permission}",
             show_alert=True,
         )
     user_id = cq.data.split("_")[1]
@@ -609,12 +609,12 @@ async def remove_warning(_, cq: CallbackQuery):
     if warns:
         warns = warns["warns"]
     if not warns or warns == 0:
-        return await cq.answer("User has no warnings.")
+        return await cq.answer("У пользователя нет предупреждений.")
     warn = {"warns": warns - 1}
     await add_warn(chat_id, await int_to_alpha(user_id), warn)
     text = cq.message.text.markdown
     text = f"~~{text}~~\n\n"
-    text += f"__Warn removed by {from_user.mention}__"
+    text += f"__❌Предупреждение удалил {from_user.mention}❌__"
     await cq.message.edit(text)
 
 
@@ -628,7 +628,7 @@ async def remove_warning(_, cq: CallbackQuery):
 async def remove_warnings(_, message: Message):
     if not message.reply_to_message:
         return await message.reply_text(
-            "Reply to a message to remove a user's warnings."
+            "Ответьте на сообщение, чтобы удалить предупреждения пользователя."
         )
     user_id = message.reply_to_message.from_user.id
     mention = message.reply_to_message.from_user.mention
@@ -637,10 +637,10 @@ async def remove_warnings(_, message: Message):
     if warns:
         warns = warns["warns"]
     if warns == 0 or not warns:
-        await message.reply_text(f"{mention} have no warnings.")
+        await message.reply_text(f"{mention} не имеет предупреждений.")
     else:
         await remove_warns(chat_id, await int_to_alpha(user_id))
-        await message.reply_text(f"Removed warnings of {mention}.")
+        await message.reply_text(f"✅Предупреждение удалено {mention}.")
 
 
 # Warns
@@ -651,14 +651,14 @@ async def remove_warnings(_, message: Message):
 async def check_warns(_, message: Message):
     user_id = await extract_user(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("Я не могу найти этого пользователя.")
     warns = await get_warn(message.chat.id, await int_to_alpha(user_id))
     mention = (await app.get_users(user_id)).mention
     if warns:
         warns = warns["warns"]
     else:
-        return await message.reply_text(f"{mention} has no warnings.")
-    return await message.reply_text(f"{mention} has {warns}/3 warnings.")
+        return await message.reply_text(f"{mention} не имеет предупреждений.")
+    return await message.reply_text(f"{mention} имеет {warns}/3 предупреждений.")
 
 
 # Report
@@ -676,16 +676,16 @@ async def check_warns(_, message: Message):
 async def report_user(_, message):
     if not message.reply_to_message:
         return await message.reply_text(
-            "Reply to a message to report that user."
+            "Ответьте на сообщение, чтобы сообщить об этом пользователе."
         )
 
     if message.reply_to_message.from_user.id == message.from_user.id:
-        return await message.reply_text("Why are you reporting yourself ?")
+        return await message.reply_text("Зачем кидаете репорт на себя ?")
 
     list_of_admins = await list_admins(message.chat.id)
     if message.reply_to_message.from_user.id in list_of_admins:
         return await message.reply_text(
-            "Do you know that the user you are replying is an admin ?"
+            "Вы <b>не можете</b> пожаловаться на админа."
         )
 
     user_mention = message.reply_to_message.from_user.mention

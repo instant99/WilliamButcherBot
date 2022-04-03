@@ -48,23 +48,22 @@ from wbb.utils.dbfunctions import (
 )
 from wbb.utils.functions import extract_user, extract_user_and_reason, restart
 
-__MODULE__ = "Sudoers"
+__MODULE__ = "Судо"
 __HELP__ = """
-/stats - To Check System Status.
 
-/gstats - To Check Bot's Global Stats.
+/gstats - Проверить глобальную статистику бота.
 
-/gban - To Ban A User Globally.
+/gban - Забанить пользователя глобально.
 
-/clean_db - Clean database.
+/clean_db - Очистить базу данных.
 
-/broadcast - To Broadcast A Message To All Groups.
+/broadcast - Рассылка сообщения всем группам.
 
-/update - To Update And Restart The Bot
+/update - Обновить и перезапустить бота
 
-/eval - Execute Python Code
+/eval - Выполнить код Python
 
-/sh - Execute Shell Code
+/sh - Выполнить шелл-код
 """
 
 
@@ -100,17 +99,17 @@ async def ban_globally(_, message):
     from_user = message.from_user
 
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("Я не могу найти этого пользователя.")
     if not reason:
-        return await message.reply("No reason provided.")
+        return await message.reply("Причина не указана.")
 
     if user_id in [from_user.id, BOT_ID] or user_id in SUDOERS:
-        return await message.reply_text("I can't ban that user.")
+        return await message.reply_text("Я не могу забанить этого пользователя.")
 
     served_chats = await get_served_chats()
     m = await message.reply_text(
-        f"**Banning {user.mention} Globally!**"
-        + f" **This Action Should Take About {len(served_chats)} Seconds.**"
+        f"**Пользователь {user.mention} Забанен глобально!**"
+        + f" **Это действие должно занять около {len(served_chats)} Секунд.**"
     )
     await add_gban_user(user_id)
     number_of_chats = 0
@@ -126,20 +125,20 @@ async def ban_globally(_, message):
     try:
         await app.send_message(
             user.id,
-            f"Hello, You have been globally banned by {from_user.mention},"
-            + " You can appeal for this ban by talking to him.",
+            f"Здравствуйте, Вы были глобально забанены пользователем {from_user.mention},"
+            + " Вы можете обжаловать этот запрет, поговорив с ним.",
         )
     except Exception:
         pass
-    await m.edit(f"Banned {user.mention} Globally!")
+    await m.edit(f"Пользователь {user.mention} Забанен глобально!")
     ban_text = f"""
-__**New Global Ban**__
-**Origin:** {message.chat.title} [`{message.chat.id}`]
-**Admin:** {from_user.mention}
-**Banned User:** {user.mention}
-**Banned User ID:** `{user_id}`
-**Reason:** __{reason}__
-**Chats:** `{number_of_chats}`"""
+__**Новый глобальный бан**__
+**Источник:** {message.chat.title} [`{message.chat.id}`]
+**Админ:** {from_user.mention}
+**Забаненный юзер:** {user.mention}
+**Забаненный ID юзера:** `{user_id}`
+**Причина:** __{reason}__
+**Чаты:** `{number_of_chats}`"""
     try:
         m2 = await app.send_message(
             GBAN_LOG_GROUP_ID,
@@ -147,12 +146,12 @@ __**New Global Ban**__
             disable_web_page_preview=True,
         )
         await m.edit(
-            f"Banned {user.mention} Globally!\nAction Log: {m2.link}",
+            f"Пользователь {user.mention} Забанен глобально!\nЖурнал действий: {m2.link}",
             disable_web_page_preview=True,
         )
     except Exception:
         await message.reply_text(
-            "User Gbanned, But This Gban Action Wasn't Logged, Add Me Bot In GBAN_LOG_GROUP"
+            "Пользователь забанен, но это действие Gban не было выполнено, добавьте меня бота GBAN_LOG_GROUP"
         )
 
 
@@ -164,15 +163,15 @@ __**New Global Ban**__
 async def unban_globally(_, message):
     user_id = await extract_user(message)
     if not user_id:
-        return await message.reply_text("I can't find that user.")
+        return await message.reply_text("Я не могу найти этого пользователя.")
     user = await app.get_users(user_id)
 
     is_gbanned = await is_gbanned_user(user.id)
     if not is_gbanned:
-        await message.reply_text("I don't remember Gbanning him.")
+        await message.reply_text("Я не помню, чтобы его банили глобально.")
     else:
         await remove_gban_user(user.id)
-        await message.reply_text(f"Lifted {user.mention}'s Global Ban.'")
+        await message.reply_text(f"Пользователю {user.mention}'s Снят глобальный бан.'")
 
 
 # Broadcast
@@ -200,7 +199,7 @@ async def broadcast_message(_, message):
             await asyncio.sleep(int(e.x))
         except Exception:
             pass
-    await m.edit(f"**Broadcasted Message In {sent} Chats.**")
+    await m.edit(f"**Входящее сообщение отправлено в {sent} чатов.**")
 
 
 # Update
@@ -210,12 +209,12 @@ async def broadcast_message(_, message):
 async def update_restart(_, message):
     try:
         out = subprocess.check_output(["git", "pull"]).decode("UTF-8")
-        if "Already up to date." in str(out):
-            return await message.reply_text("Its already up-to date!")
+        if "Уже в курсе." in str(out):
+            return await message.reply_text("Это уже актуально!")
         await message.reply_text(f"```{out}```")
     except Exception as e:
         return await message.reply_text(str(e))
     m = await message.reply_text(
-        "**Updated with default branch, restarting now.**"
+        "**Обновлено веткой по умолчанию, перезапуск будет сейчас.**"
     )
     await restart(m)

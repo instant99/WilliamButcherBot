@@ -3,10 +3,10 @@ from pyrogram.types import Message
 
 from wbb import SUDOERS, USERBOT_PREFIX, app, app2
 
-__MODULE__ = "Dice"
+__MODULE__ = "Кубик"
 __HELP__ = """
 /dice
-    Roll a dice.
+    Бросить кубик.
 """
 
 

@@ -30,10 +30,10 @@ from wbb import SUDOERS, app
 from wbb.core.sections import section
 from wbb.utils.dbfunctions import is_gbanned_user, user_global_karma
 
-__MODULE__ = "Info"
+__MODULE__ = "Инфо"
 __HELP__ = """
-/info [USERNAME|ID] - Get info about a user.
-/chat_info [USERNAME|ID] - Get info about a chat.
+/info [USERNAME|ID] - Получить информацию о пользователе.
+/chat_info [USERNAME|ID] - Получить информацию о чате.
 """
 
 
@@ -41,7 +41,7 @@ async def get_user_info(user, already=False):
     if not already:
         user = await app.get_users(user)
     if not user.first_name:
-        return ["Deleted account", None]
+        return ["Удаленный аккаунт", None]
     user_id = user.id
     username = user.username
     first_name = user.first_name
@@ -54,14 +54,14 @@ async def get_user_info(user, already=False):
     body = {
         "ID": user_id,
         "DC": dc_id,
-        "Name": [first_name],
-        "Username": [("@" + username) if username else "Null"],
-        "Mention": [mention],
-        "Sudo": is_sudo,
-        "Karma": karma,
-        "Gbanned": is_gbanned,
+        "Имя": [first_name],
+        "Имя пользователя": [("@" + username) if username else "Null"],
+        "Упомянуто": [mention],
+        "Судо": is_sudo,
+        "Карма": karma,
+        "Глобал баны": is_gbanned,
     }
-    caption = section("User info", body)
+    caption = section("Информация о пользователе", body)
     return [caption, photo_id]
 
 
@@ -82,14 +82,14 @@ async def get_chat_info(chat, already=False):
     body = {
         "ID": chat_id,
         "DC": dc_id,
-        "Type": type_,
-        "Name": [title],
-        "Username": [("@" + username) if username else "Null"],
-        "Mention": [link],
-        "Members": members,
-        "Scam": is_scam,
-        "Restricted": is_restricted,
-        "Description": [description],
+        "Тип": type_,
+        "Имя": [title],
+        "Ник": [("@" + username) if username else "Null"],
+        "Упомянуто": [link],
+        "Людей": members,
+        "Скам": is_scam,
+        "Ограниченния": is_restricted,
+        "Описание": [description],
     }
     caption = section("Chat info", body)
     return [caption, photo_id]
@@ -104,7 +104,7 @@ async def info_func(_, message: Message):
     elif not message.reply_to_message and len(message.command) != 1:
         user = message.text.split(None, 1)[1]
 
-    m = await message.reply_text("Processing")
+    m = await message.reply_text("Процесс")
 
     try:
         info_caption, photo_id = await get_user_info(user)
@@ -125,7 +125,7 @@ async def chat_info_func(_, message: Message):
     try:
         if len(message.command) > 2:
             return await message.reply_text(
-                "**Usage:**/chat_info [USERNAME|ID]"
+                "**Примечание:**/chat_info [USERNAME|ID]"
             )
 
         if len(message.command) == 1:
@@ -133,7 +133,7 @@ async def chat_info_func(_, message: Message):
         elif len(message.command) == 2:
             chat = message.text.split(None, 1)[1]
 
-        m = await message.reply_text("Processing")
+        m = await message.reply_text("Процесс")
 
         info_caption, photo_id = await get_chat_info(chat)
         if not photo_id:

@@ -14,9 +14,9 @@ async def parse(_, message: Message):
     r = message.reply_to_message
     has_wpp = False
     if not r:
-        return await eor(message, text="Reply to a message with a webpage")
+        return await eor(message, text="Ответьте на сообщение с веб-страницей")
 
-    m_ = await eor(message, text="Parsing...")
+    m_ = await eor(message, text="Парсинг...")
 
     if not r.web_page:
         text = r.text or r.caption
@@ -32,7 +32,7 @@ async def parse(_, message: Message):
 
     if not has_wpp:
         return await m_.edit(
-            "Replied message has no webpage preview.",
+            "Отвеченное сообщение не имеет предварительного просмотра веб-страницы.",
         )
 
     wpp = r.web_page

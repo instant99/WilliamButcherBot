@@ -54,10 +54,10 @@ async def statusUpdaterFunc(_, update):
 
 async def sendLog(message: Message):
     msg = f"""
-**User:** {message.from_user.mention if message.from_user else None} [`{message.from_user.id if message.from_user else None}`]
-**Text:** {message.text.markdown if message.text else message.caption if message.caption else None}
-**Chat:** {message.chat.title} [`{message.chat.id}`]
-**Bot:** {message.from_user.is_bot}
+**Пользователь:** {message.from_user.mention if message.from_user else None} [`{message.from_user.id if message.from_user else None}`]
+**Текст:** {message.text.markdown if message.text else message.caption if message.caption else None}
+**Чат:** {message.chat.title} [`{message.chat.id}`]
+**Бот:** {message.from_user.is_bot}
 """
     button = InlineKeyboard(row_width=1)
     button.add(InlineKeyboardButton(text="Check Action", url=message.link))

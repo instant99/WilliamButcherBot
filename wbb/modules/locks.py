@@ -31,22 +31,22 @@ from wbb.core.decorators.permissions import adminsOnly
 from wbb.modules.admin import current_chat_permissions, list_admins
 from wbb.utils.functions import get_urls_from_text
 
-__MODULE__ = "Locks"
+__MODULE__ = "Запреты"
 __HELP__ = """
-Commands: /lock | /unlock | /locks [No Parameters Required]
+Команда: /lock | /unlock | /locks [Параметры не требуются]
 
-Parameters:
+Параметры:
     messages | stickers | gifs | media | games | polls
 
     inline  | url | group_info | user_add | pin
 
-You can only pass the "all" parameter with /lock, not with /unlock
+Вы можете передать параметр "all" параметр с /lock, но без /unlock
 
-Example:
+Пример:
     /lock all
 """
 
-incorrect_parameters = "Incorrect Parameters, Check Locks Section In Help."
+incorrect_parameters = "Неверные параметры, проверьте раздел блокировки в справке."
 # Using disable_preview as a switch for url checker
 # That way we won't need an additional db to check
 # If url lock is enabled/disabled for a chat
@@ -68,11 +68,11 @@ data = {
 async def tg_lock(message, permissions: list, perm: str, lock: bool):
     if lock:
         if perm not in permissions:
-            return await message.reply_text("Already locked.")
+            return await message.reply_text("Уже заблокировано.")
         permissions.remove(perm)
     else:
         if perm in permissions:
-            return await message.reply_text("Already Unlocked.")
+            return await message.reply_text("Уже разблокировано.")
         permissions.append(perm)
 
     permissions = {perm: True for perm in list(set(permissions))}
@@ -83,10 +83,10 @@ async def tg_lock(message, permissions: list, perm: str, lock: bool):
         )
     except ChatNotModified:
         return await message.reply_text(
-            "To unlock this, you have to unlock 'messages' first."
+            "Смотрите /locks, чтобы узнать, что может быть заблокировано и разблокировано!."
         )
 
-    await message.reply_text(("Locked." if lock else "Unlocked."))
+    await message.reply_text(("Заблокировано." if lock else "Разблокировано."))
 
 
 @app.on_message(filters.command(["lock", "unlock"]) & ~filters.private)
@@ -113,7 +113,7 @@ async def locks_func(_, message):
         )
     elif parameter == "all" and state == "lock":
         await app.set_chat_permissions(chat_id, ChatPermissions())
-        await message.reply_text(f"Locked Everything in {message.chat.title}")
+        await message.reply_text(f"Все запрещено в чате {message.chat.title}")
 
     elif parameter == "all" and state == "unlock":
         await app.set_chat_permissions(
@@ -129,7 +129,7 @@ async def locks_func(_, message):
                 can_pin_messages=False,
             ),
         )
-        await message.reply(f"Unlocked Everything in {message.chat.title}")
+        await message.reply(f"Все разрешено в чате {message.chat.title}")
 
 
 @app.on_message(filters.command("locks") & ~filters.private)
@@ -138,7 +138,7 @@ async def locktypes(_, message):
     permissions = await current_chat_permissions(message.chat.id)
 
     if not permissions:
-        return await message.reply_text("No Permissions.")
+        return await message.reply_text("Недостаточно прав.")
 
     perms = ""
     for i in permissions:
@@ -167,6 +167,6 @@ async def url_detector(_, message):
                 await message.delete()
             except Exception:
                 await message.reply_text(
-                    "This message contains a URL, "
-                    + "but i don't have enough permissions to delete it"
+                    "Это сообщение содержит ссылку, "
+                    + "но у меня недостаточно прав, чтобы удалить его"
                 )

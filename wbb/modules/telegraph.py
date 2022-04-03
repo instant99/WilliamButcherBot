@@ -4,8 +4,8 @@ from pyrogram.types import Message
 from wbb import app, telegraph
 from wbb.core.decorators.errors import capture_err
 
-__MODULE__ = "Telegraph"
-__HELP__ = "/telegraph [Page name]: Paste styled text on telegraph."
+__MODULE__ = "Телеграф"
+__HELP__ = "/telegraph [Page name]: Вставить стилизованный текст в telegraph."
 
 
 @app.on_message(filters.command("telegraph"))
@@ -14,10 +14,10 @@ async def paste(_, message: Message):
     reply = message.reply_to_message
 
     if not reply or not reply.text:
-        return await message.reply("Reply to a text message")
+        return await message.reply("Ответьте на текстовое сообщение")
 
     if len(message.command) < 2:
-        return await message.reply("**Usage:**\n /telegraph [Page name]")
+        return await message.reply("**Применение:**\n /telegraph [Ссылка на страницу]")
 
     page_name = message.text.split(None, 1)[1]
     page = telegraph.create_page(

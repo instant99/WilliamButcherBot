@@ -30,13 +30,12 @@ from pyrogram.types import Message
 from wbb import SUDOERS, USERBOT_PREFIX, app, app2, arq
 from wbb.core.decorators.errors import capture_err
 
-__MODULE__ = "Quotly"
+__MODULE__ = "Цитата"
 __HELP__ = """
-/q - To quote a message.
-/q [INTEGER] - To quote more than 1 messages.
-/q r - to quote a message with it's reply
+/q - Цитировать сообщение.
+/q [INTEGER] - Цитировать более 1 сообщения.
+/q r - цитировать сообщение с ответом
 
-Use .q to quote using userbot
 """
 
 
@@ -69,12 +68,12 @@ def isArgInt(message: Message) -> list:
 @capture_err
 async def quotly_func(client, message: Message):
     if not message.reply_to_message:
-        return await message.reply_text("Reply to a message to quote it.")
+        return await message.reply_text("Ответьте на сообщение, чтобы процитировать его.")
     if not message.reply_to_message.text:
         return await message.reply_text(
-            "Replied message has no text, can't quote it."
+            "Ответное сообщение не имеет текста, не могу его процитировать."
         )
-    m = await message.reply_text("Quoting Messages")
+    m = await message.reply_text("Подготовка картинки...")
     if len(message.command) < 2:
         messages = [message.reply_to_message]
 
@@ -82,7 +81,7 @@ async def quotly_func(client, message: Message):
         arg = isArgInt(message)
         if arg[0]:
             if arg[1] < 2 or arg[1] > 10:
-                return await m.edit("Argument must be between 2-10.")
+                return await m.edit("Аргумент должен быть между 2-10.")
 
             count = arg[1]
 
@@ -104,7 +103,7 @@ async def quotly_func(client, message: Message):
         else:
             if getArg(message) != "r":
                 return await m.edit(
-                    "Incorrect Argument, Pass **'r'** or **'INT'**, **EX:** __/q 2__"
+                    "Неверный аргумент, Pass **'r'** or **'INT'**, **EX:** __/q 2__"
                 )
             reply_message = await client.get_messages(
                 message.chat.id,
@@ -114,11 +113,11 @@ async def quotly_func(client, message: Message):
             messages = [reply_message]
     else:
         return await m.edit(
-            "Incorrect argument, check quotly module in help section."
+            "Неверный аргумент, проверьте модуль quotly в разделе справки."
         )
     try:
         if not message:
-            return await m.edit("Something went wrong.")
+            return await m.edit("Что-то пошло не так.")
 
         sticker = await quotify(messages)
         if not sticker[0]:
@@ -130,10 +129,10 @@ async def quotly_func(client, message: Message):
         sticker.close()
     except Exception as e:
         await m.edit(
-            "Something went wrong while quoting messages,"
-            + " This error usually happens when there's a "
-            + " message containing something other than text,"
-            + " or one of the messages in-between are deleted."
+            "Что-то пошло не так при цитировании сообщений,"
+            + " Эта ошибка обычно возникает при наличии "
+            + " сообщение, содержащее что-то кроме текста,"
+            + " или одно из промежуточных сообщений удалено."
         )
         e = format_exc()
         print(e)

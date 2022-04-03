@@ -38,11 +38,11 @@ from wbb.utils.dbfunctions import (
 )
 from wbb.utils.filter_groups import blacklist_filters_group
 
-__MODULE__ = "Blacklist"
+__MODULE__ = "Черный список"
 __HELP__ = """
-/blacklisted - Get All The Blacklisted Words In The Chat.
-/blacklist [WORD|SENTENCE] - Blacklist A Word Or A Sentence.
-/whitelist [WORD|SENTENCE] - Whitelist A Word Or A Sentence.
+/blacklisted - Получить список слов находящихся в черном списке.
+/blacklist [WORD|SENTENCE] - Добавить слово или фразу в черный список.
+/whitelist [WORD|SENTENCE] - Добаить слово или фразу в белый список.
 """
 
 
@@ -52,15 +52,15 @@ __HELP__ = """
 @adminsOnly("can_restrict_members")
 async def save_filters(_, message):
     if len(message.command) < 2:
-        return await message.reply_text("Usage:\n/blacklist [WORD|SENTENCE]")
+        return await message.reply_text("Применение:\n/blacklist [WORD|SENTENCE]")
     word = message.text.split(None, 1)[1].strip()
     if not word:
         return await message.reply_text(
-            "**Usage**\n__/blacklist [WORD|SENTENCE]__"
+            "**Применение**\n__/blacklist [WORD|SENTENCE]__"
         )
     chat_id = message.chat.id
     await save_blacklist_filter(chat_id, word)
-    await message.reply_text(f"__**Blacklisted {word}.**__")
+    await message.reply_text(f"__**Слово {word} добавлено в черный список.**__")
 
 
 @app.on_message(
@@ -70,9 +70,9 @@ async def save_filters(_, message):
 async def get_filterss(_, message):
     data = await get_blacklisted_words(message.chat.id)
     if not data:
-        await message.reply_text("**No blacklisted words in this chat.**")
+        await message.reply_text("**В этом чате нет слов из черного списка.**")
     else:
-        msg = f"List of blacklisted words in {message.chat.title}\n"
+        msg = f"Список слов из черного списка {message.chat.title}\n"
         for word in data:
             msg += f"**-** `{word}`\n"
         await message.reply_text(msg)
@@ -84,15 +84,15 @@ async def get_filterss(_, message):
 @adminsOnly("can_restrict_members")
 async def del_filter(_, message):
     if len(message.command) < 2:
-        return await message.reply_text("Usage:\n/whitelist [WORD|SENTENCE]")
+        return await message.reply_text("Применение:\n/whitelist [WORD|SENTENCE]")
     word = message.text.split(None, 1)[1].strip()
     if not word:
-        return await message.reply_text("Usage:\n/whitelist [WORD|SENTENCE]")
+        return await message.reply_text("Применение:\n/whitelist [WORD|SENTENCE]")
     chat_id = message.chat.id
     deleted = await delete_blacklist_filter(chat_id, word)
     if deleted:
-        return await message.reply_text(f"**Whitelisted {word}.**")
-    await message.reply_text("**No such blacklist filter.**")
+        return await message.reply_text(f"**Слово {word} убрано с черного списка.**")
+    await message.reply_text("**Такой фильтр отстутствует в черном списке.**")
 
 
 @app.on_message(filters.text & ~filters.private, group=blacklist_filters_group)
@@ -123,6 +123,6 @@ async def blacklist_filters_re(_, message):
                 return
             return await app.send_message(
                 chat_id,
-                f"Muted {user.mention} [`{user.id}`] for 1 hour "
-                + f"due to a blacklist match on {word}.",
+                f"Выдан мут пользователю {user.mention} [`{user.id}`] на 1 час"
+                + f"из-за совпадения с черным списком слова {word}.",
             )
